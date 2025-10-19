@@ -7,7 +7,6 @@ public class Tabuleiro {
 
     private final Casa[][] casas;
     
-    // NOVAS VARIÁVEIS para a sua regra customizada
     private boolean primeiroMovimentoBrancasFeito;
     private boolean primeiroMovimentoPretasFeito;
     
@@ -22,7 +21,6 @@ public class Tabuleiro {
     public void reset() {
         contadorChecksBrancas = 0;
         contadorChecksPretas = 0;
-        // Reseta as flags para a nova partida
         primeiroMovimentoBrancasFeito = false;
         primeiroMovimentoPretasFeito = false;
         inicializarTabuleiro();
@@ -34,11 +32,14 @@ public class Tabuleiro {
         
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                casas[i][j] = new Casa(i, j);
+                if (casas[i][j] == null) {
+                    casas[i][j] = new Casa(i, j);
+                } else {
+                    casas[i][j].removerPeca();
+                }
             }
         }
         
-        // Reposiciona todas as peças, incluindo o reset do estado 'jaMoveu' delas
         // Peças Pretas
         casas[0][0].setPeca(new Torre(Cor.PRETA));
         casas[0][1].setPeca(new Cavalo(Cor.PRETA));
@@ -73,10 +74,13 @@ public class Tabuleiro {
         return null;
     }
     
-    public void moverPeca(Casa origem, Casa destino) {
+    /**
+     * Move uma peça e verifica se houve promoção.
+     * @return Verdadeiro se um peão foi promovido, falso caso contrário.
+     */
+    public boolean moverPeca(Casa origem, Casa destino) {
         Peca pecaMovida = origem.getPeca();
         
-        // ATUALIZAÇÃO: Marca que o primeiro movimento da cor foi feito
         if (pecaMovida.getCor() == Cor.BRANCA) {
             this.primeiroMovimentoBrancasFeito = true;
         } else {
@@ -85,10 +89,27 @@ public class Tabuleiro {
         
         destino.setPeca(pecaMovida);
         origem.removerPeca();
-        pecaMovida.registrarMovimento(); // Mantém isso para a lógica do Roque
+        pecaMovida.registrarMovimento();
+
+        // --- LÓGICA DE PROMOÇÃO ---
+        if (pecaMovida instanceof Peao) {
+            // Se um peão branco chegar na linha 0
+            if (pecaMovida.getCor() == Cor.BRANCA && destino.getLinha() == 0) {
+                destino.setPeca(new Rainha(Cor.BRANCA));
+                System.out.println("Peão Branco promovido a Rainha!");
+                return true;
+            }
+            // Se um peão preto chegar na linha 7
+            if (pecaMovida.getCor() == Cor.PRETA && destino.getLinha() == 7) {
+                destino.setPeca(new Rainha(Cor.PRETA));
+                System.out.println("Peão Preto promovido a Rainha!");
+                return true;
+            }
+        }
+        
+        return false;
     }
     
-    // MÉTODOS GETTER para a nova lógica
     public boolean isPrimeiroMovimentoBrancasFeito() {
         return primeiroMovimentoBrancasFeito;
     }
@@ -105,8 +126,14 @@ public class Tabuleiro {
 
              Casa casaTorreOrigem = getCasa(linha, colunaTorreOrigem);
              Casa casaTorreDestino = getCasa(linha, colunaTorreDestino);
-             moverPeca(casaTorreOrigem, casaTorreDestino);
-             return casaTorreOrigem;
+             if (casaTorreOrigem != null && casaTorreDestino != null) {
+                // A chamada moverPeca aqui não precisa verificar promoção
+                Peca torre = casaTorreOrigem.getPeca();
+                casaTorreDestino.setPeca(torre);
+                casaTorreOrigem.removerPeca();
+                torre.registrarMovimento();
+                return casaTorreOrigem;
+             }
         }
         return null;
     }

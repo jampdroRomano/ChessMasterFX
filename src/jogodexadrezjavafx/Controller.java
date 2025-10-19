@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
@@ -15,6 +19,7 @@ import javafx.scene.shape.Circle;
 public class Controller {
 
     @FXML private GridPane gridPaneTabuleiro;
+    // A variável rootPane foi mantida para a lógica de escala.
     @FXML private StackPane rootPane;
 
     @FXML private StackPane a1, b1, c1, d1, e1, f1, g1, h1;
@@ -32,6 +37,9 @@ public class Controller {
     private Casa casaOrigem;
     private List<Casa> movimentosPossiveis = new ArrayList<>();
     private boolean jogoAcabou = false;
+    
+    private int vitoriasBrancas = 0;
+    private int vitoriasPretas = 0;
 
     private final Map<Casa, StackPane> mapaCasaParaStackPane = new HashMap<>();
     private final Map<StackPane, Casa> mapaStackPaneParaCasa = new HashMap<>();
@@ -45,6 +53,7 @@ public class Controller {
         configurarMapeamentoECliques();
     }
     
+    // O método de validação de tela foi mantido.
     public void aplicarEscalaParaTelaGrande() {
         double fatorEscala = 1.6; 
         if(gridPaneTabuleiro != null){
@@ -70,12 +79,12 @@ public class Controller {
                 Casa casa = tabuleiro.getCasa(i, j);
                 StackPane sp = stackPanes[i][j];
                 
-                mapaCasaParaStackPane.put(casa, sp);
-                mapaStackPaneParaCasa.put(sp, casa);
-                
-                estilosOriginais.put(sp, sp.getStyle());
-                
-                sp.setOnMouseClicked(event -> onCasaClicked(sp));
+                if (casa != null && sp != null) {
+                    mapaCasaParaStackPane.put(casa, sp);
+                    mapaStackPaneParaCasa.put(sp, casa);
+                    estilosOriginais.put(sp, sp.getStyle());
+                    sp.setOnMouseClicked(event -> onCasaClicked(sp));
+                }
             }
         }
     }
@@ -87,9 +96,12 @@ public class Controller {
 
         if (pecaSelecionada != null) {
             if (movimentosPossiveis.contains(casaClicada)) {
+                Peca pecaCapturada = casaClicada.getPeca();
                 moverPeca(casaOrigem, casaClicada);
-                verificarFimDeJogoAposMovimento();
-                trocarTurno();
+                verificarFimDeJogoAposMovimento(pecaCapturada);
+                if (!jogoAcabou) {
+                    trocarTurno();
+                }
                 limparSelecao();
             } else {
                 limparSelecao();
@@ -112,10 +124,13 @@ public class Controller {
         ImageView pecaVisual = (ImageView) spOrigem.getChildren().stream()
                 .filter(node -> node instanceof ImageView).findFirst().orElse(null);
 
+        // A lógica de mover a peça é chamada primeiro, e nos diz se houve promoção
+        boolean promocaoOcorreu = tabuleiro.moverPeca(origem, destino);
+
+        // Lógica para mover a peça VISUALMENTE
         if (pecaMovida instanceof Rei && Math.abs(destino.getColuna() - origem.getColuna()) == 2) {
-            tabuleiro.moverPeca(origem, destino);
             spDestino.getChildren().removeIf(node -> node instanceof ImageView);
-            spDestino.getChildren().add(pecaVisual);
+            if (pecaVisual != null) spDestino.getChildren().add(pecaVisual);
             
             Casa casaOrigemTorre = tabuleiro.moverTorreRoque(destino);
             StackPane spOrigemTorre = mapaCasaParaStackPane.get(casaOrigemTorre);
@@ -124,28 +139,70 @@ public class Controller {
             ImageView torreVisual = (ImageView) spOrigemTorre.getChildren().stream()
                 .filter(node -> node instanceof ImageView).findFirst().orElse(null);
             
-            spDestinoTorre.getChildren().add(torreVisual);
+            if (torreVisual != null) spDestinoTorre.getChildren().add(torreVisual);
 
         } else {
-            if(destino.temPeca()){
-                System.out.println("Peça " + destino.getPeca().getClass().getSimpleName() + " capturada!");
-            }
-            tabuleiro.moverPeca(origem, destino);
             spDestino.getChildren().removeIf(node -> node instanceof ImageView);
-            spDestino.getChildren().add(pecaVisual);
+            if (pecaVisual != null) {
+                spDestino.getChildren().add(pecaVisual);
+            }
+        }
+        
+        // --- NOVA LÓGICA VISUAL DA PROMOÇÃO ---
+        if (promocaoOcorreu && pecaVisual != null) {
+            System.out.println("Promoção! Peão virou Rainha.");
+            String caminhoImagemRainha = (pecaMovida.getCor() == Cor.BRANCA) 
+                ? "/resources/imagens/PecaRainhaBranca.png" 
+                : "/resources/imagens/PecaRainhaPreta.png";
+            try {
+                Image novaImagem = new Image(getClass().getResourceAsStream(caminhoImagemRainha));
+                pecaVisual.setImage(novaImagem);
+            } catch (Exception e) {
+                System.err.println("Erro ao carregar imagem da rainha para promoção: " + e.getMessage());
+            }
         }
     }
     
-    private void verificarFimDeJogoAposMovimento() {
+    private void verificarFimDeJogoAposMovimento(Peca pecaCapturada) {
         Cor corOponente = (turnoAtual == Cor.BRANCA) ? Cor.PRETA : Cor.BRANCA;
         tabuleiro.verificarChequeAposMovimento(corOponente);
 
+        String vencedor = null;
+
         if (tabuleiro.getContadorChecksBrancas() >= 3) {
-            System.out.println("FIM DE JOGO! As PRETAS venceram por 3 xeques!");
-            jogoAcabou = true;
+            vencedor = "PRETAS";
+            vitoriasPretas++;
         } else if (tabuleiro.getContadorChecksPretas() >= 3) {
-            System.out.println("FIM DE JOGO! As BRANCAS venceram por 3 xeques!");
+            vencedor = "BRANCAS";
+            vitoriasBrancas++;
+        } else if (pecaCapturada instanceof Rei) {
+            vencedor = (pecaCapturada.getCor() == Cor.BRANCA) ? "PRETAS" : "BRANCAS";
+            if ("PRETAS".equals(vencedor)) vitoriasPretas++; else vitoriasBrancas++;
+        }
+        
+        if (vencedor != null) {
             jogoAcabou = true;
+            limparDestaques();
+            mostrarDialogoFimDeJogo(vencedor);
+        }
+    }
+    
+    private void mostrarDialogoFimDeJogo(String vencedor) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Fim de Jogo!");
+        alert.setHeaderText("As " + vencedor + " venceram!");
+        alert.setContentText("Deseja jogar novamente?");
+
+        ButtonType botaoSim = new ButtonType("Sim");
+        ButtonType botaoNao = new ButtonType("Não");
+
+        alert.getButtonTypes().setAll(botaoSim, botaoNao);
+
+        Optional<ButtonType> result = alert.showAndWait();
+        if (result.isPresent() && result.get() == botaoSim){
+            // Lógica para reiniciar ainda não implementada
+        } else {
+            gridPaneTabuleiro.setDisable(true);
         }
     }
 
@@ -166,7 +223,6 @@ public class Controller {
     private void trocarTurno() {
         if (!jogoAcabou) {
             turnoAtual = (turnoAtual == Cor.BRANCA) ? Cor.PRETA : Cor.BRANCA;
-            System.out.println("--- Turno das " + turnoAtual.toString() + "S ---");
         }
     }
 
@@ -174,15 +230,20 @@ public class Controller {
         limparDestaques();
         
         StackPane spOrigem = mapaCasaParaStackPane.get(casaOrigem);
-        String estiloOriginal = estilosOriginais.get(spOrigem);
-        spOrigem.setStyle(estiloOriginal + "; -fx-border-color: yellow; -fx-border-width: 3;");
-        destaquesMovimento.add(spOrigem);
+        if (spOrigem != null) {
+            String estiloOriginal = estilosOriginais.get(spOrigem);
+            spOrigem.setStyle(estiloOriginal + "; -fx-border-color: yellow; -fx-border-width: 3;");
+            destaquesMovimento.add(spOrigem);
+        }
         
         for (Casa casaDestino : movimentosPossiveis) {
             StackPane spDestino = mapaCasaParaStackPane.get(casaDestino);
-            Circle circulo = new Circle(15, Color.rgb(128, 128, 128, 0.5));
-            destaquesMovimento.add(circulo);
-            spDestino.getChildren().add(circulo);
+            if (spDestino != null) {
+                Circle circulo = new Circle(15, Color.rgb(128, 128, 128, 0.5));
+                circulo.setMouseTransparent(true);
+                destaquesMovimento.add(circulo);
+                spDestino.getChildren().add(circulo);
+            }
         }
     }
     
@@ -200,5 +261,4 @@ public class Controller {
         destaquesMovimento.clear();
     }
 }
-
 

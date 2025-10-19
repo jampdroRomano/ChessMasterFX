@@ -8,7 +8,7 @@
   </information>
   <resources>
     <j2se version="1.6+" href="http://java.sun.com/products/autodl/j2se"/>
-    <jar href="JogoDeXadrezJavaFx.jar" size="1489098" download="eager" />
+    <jar href="JogoDeXadrezJavaFx.jar" size="1490495" download="eager" />
   </resources>
   <jfx:javafx-desc  width="800" height="600" main-class="jogodexadrezjavafx.Main"  name="JogoDeXadrezJavaFx" />
   <update check="always"/>
