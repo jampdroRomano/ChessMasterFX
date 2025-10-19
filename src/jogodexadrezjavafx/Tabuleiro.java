@@ -7,6 +7,10 @@ public class Tabuleiro {
 
     private final Casa[][] casas;
     
+    // NOVAS VARIÁVEIS para a sua regra customizada
+    private boolean primeiroMovimentoBrancasFeito;
+    private boolean primeiroMovimentoPretasFeito;
+    
     private int contadorChecksBrancas = 0;
     private int contadorChecksPretas = 0;
 
@@ -15,13 +19,26 @@ public class Tabuleiro {
         inicializarTabuleiro();
     }
 
+    public void reset() {
+        contadorChecksBrancas = 0;
+        contadorChecksPretas = 0;
+        // Reseta as flags para a nova partida
+        primeiroMovimentoBrancasFeito = false;
+        primeiroMovimentoPretasFeito = false;
+        inicializarTabuleiro();
+    }
+    
     private void inicializarTabuleiro() {
+        primeiroMovimentoBrancasFeito = false;
+        primeiroMovimentoPretasFeito = false;
+        
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 casas[i][j] = new Casa(i, j);
             }
         }
-
+        
+        // Reposiciona todas as peças, incluindo o reset do estado 'jaMoveu' delas
         // Peças Pretas
         casas[0][0].setPeca(new Torre(Cor.PRETA));
         casas[0][1].setPeca(new Cavalo(Cor.PRETA));
@@ -58,24 +75,38 @@ public class Tabuleiro {
     
     public void moverPeca(Casa origem, Casa destino) {
         Peca pecaMovida = origem.getPeca();
+        
+        // ATUALIZAÇÃO: Marca que o primeiro movimento da cor foi feito
+        if (pecaMovida.getCor() == Cor.BRANCA) {
+            this.primeiroMovimentoBrancasFeito = true;
+        } else {
+            this.primeiroMovimentoPretasFeito = true;
+        }
+        
         destino.setPeca(pecaMovida);
         origem.removerPeca();
-        pecaMovida.registrarMovimento();
+        pecaMovida.registrarMovimento(); // Mantém isso para a lógica do Roque
+    }
+    
+    // MÉTODOS GETTER para a nova lógica
+    public boolean isPrimeiroMovimentoBrancasFeito() {
+        return primeiroMovimentoBrancasFeito;
+    }
+
+    public boolean isPrimeiroMovimentoPretasFeito() {
+        return primeiroMovimentoPretasFeito;
     }
     
     public Casa moverTorreRoque(Casa destinoRei) {
         int linha = destinoRei.getLinha();
-        if (destinoRei.getColuna() == 6) { // Roque pequeno
-            Casa casaTorreOrigem = getCasa(linha, 7);
-            Casa casaTorreDestino = getCasa(linha, 5);
-            moverPeca(casaTorreOrigem, casaTorreDestino);
-            return casaTorreOrigem;
-        }
-        if (destinoRei.getColuna() == 2) { // Roque grande
-            Casa casaTorreOrigem = getCasa(linha, 0);
-            Casa casaTorreDestino = getCasa(linha, 3);
-            moverPeca(casaTorreOrigem, casaTorreDestino);
-            return casaTorreOrigem;
+        if (destinoRei.getColuna() == 6 || destinoRei.getColuna() == 2) {
+             int colunaTorreOrigem = (destinoRei.getColuna() == 6) ? 7 : 0;
+             int colunaTorreDestino = (destinoRei.getColuna() == 6) ? 5 : 3;
+
+             Casa casaTorreOrigem = getCasa(linha, colunaTorreOrigem);
+             Casa casaTorreDestino = getCasa(linha, colunaTorreDestino);
+             moverPeca(casaTorreOrigem, casaTorreDestino);
+             return casaTorreOrigem;
         }
         return null;
     }
@@ -85,10 +116,8 @@ public class Tabuleiro {
         if (casaDoReiOponente != null && isCasaAtacadaPor(casaDoReiOponente, (corDoOponente == Cor.BRANCA) ? Cor.PRETA : Cor.BRANCA)) {
             if (corDoOponente == Cor.BRANCA) {
                 contadorChecksBrancas++;
-                System.out.println("Rei BRANCO está em xeque! (" + contadorChecksBrancas + " de 3)");
             } else {
                 contadorChecksPretas++;
-                System.out.println("Rei PRETO está em xeque! (" + contadorChecksPretas + " de 3)");
             }
         }
     }
@@ -112,19 +141,16 @@ public class Tabuleiro {
                 if (casaAtual.temPeca() && casaAtual.getPeca().getCor() == corAtacante) {
                     Peca pecaAtacante = casaAtual.getPeca();
                     
-                    // Tratamento especial para o Peão, que ataca de forma diferente de como se move
                     if (pecaAtacante instanceof Peao) {
                         int direcao = (pecaAtacante.getCor() == Cor.BRANCA) ? -1 : 1;
                         if(casaAlvo.getLinha() == casaAtual.getLinha() + direcao && Math.abs(casaAlvo.getColuna() - casaAtual.getColuna()) == 1){
                             return true;
                         }
-                    // Trata o Rei de forma especial para evitar o loop
                     } else if (pecaAtacante instanceof Rei) {
                         if (((Rei) pecaAtacante).getMovimentosBasicos(casaAtual, this).contains(casaAlvo)) {
                             return true;
                         }
                     } else {
-                        // Para as outras peças, a lógica de movimento já inclui a de ataque
                         if (pecaAtacante.getMovimentosPossiveis(casaAtual, this).contains(casaAlvo)) {
                             return true;
                         }
