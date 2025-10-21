@@ -1,5 +1,5 @@
 package jogodexadrezjavafx;
-
+import javafx.scene.input.MouseEvent;
 import java.io.IOException;
 import java.util.Optional;
 import javafx.event.ActionEvent;
@@ -22,6 +22,51 @@ public class HomeController {
 
     @FXML
     private Button btnJogarComBot; 
+    
+    // Método para efeito hover iniciado
+    @FXML
+    private void onBtnHoverStart(MouseEvent event) {
+        Button sourceButton = (Button) event.getSource();
+        sourceButton.setStyle(
+            "-fx-background-color: #786666, linear-gradient(from 0% 0% to 0% 100%, rgba(91, 76, 76, 0.3) 0%, rgba(91, 76, 76, 1.0) 100%);" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 24.0px;"
+        );
+    }
+
+    // Método para efeito hover finalizado
+    @FXML
+    private void onBtnHoverEnd(MouseEvent event) {
+        Button sourceButton = (Button) event.getSource();
+         // Volta ao estilo original (sem gradiente de brilho)
+        sourceButton.setStyle(
+            "-fx-background-color: #786666;" +
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 24.0px;"
+        );
+    }
+
+    // Método para efeito de botão pressionado
+    @FXML
+    private void onBtnPressed(MouseEvent event) {
+        Button sourceButton = (Button) event.getSource();
+        sourceButton.setStyle(
+            "-fx-background-color: #685656;" + // Cor mais escura
+            "-fx-text-fill: white;" +
+            "-fx-font-size: 24.0px;"
+        );
+    }
+
+    // Método para quando o botão é solto (volta ao estado hover se o mouse ainda estiver sobre ele)
+     @FXML
+    private void onBtnReleased(MouseEvent event) {
+        Button sourceButton = (Button) event.getSource();
+        if (sourceButton.isHover()) {
+            onBtnHoverStart(event); // Aplica o estilo hover novamente
+        } else {
+            onBtnHoverEnd(event); // Volta ao estilo normal se o mouse saiu
+        }
+    }
 
     @FXML
     private void iniciarJogoLocal(ActionEvent event) throws IOException {
