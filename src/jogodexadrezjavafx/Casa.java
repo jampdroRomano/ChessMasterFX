@@ -31,6 +31,9 @@ public class Casa {
         return this.peca != null;
     }
 
+    /**
+     * Remove a peça desta casa, definindo-a como nula.
+     */
     public void removerPeca() {
         this.peca = null;
     }
