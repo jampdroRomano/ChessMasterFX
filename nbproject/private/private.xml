@@ -3,15 +3,12 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/jogodexadrezjavafx/Bot.java</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/resources/Home.fxml</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/jogodexadrezjavafx/Controller.java</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/jogodexadrezjavafx/Tabuleiro.java</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/jogodexadrezjavafx/HomeController.java</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/jogodexadrezjavafx/Cor.java</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/jogodexadrezjavafx/Peao.java</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/jogodexadrezjavafx/Main.java</file>
-            <file>file:/C:/Users/Laboratorio/Documents/JogoDeXadrez/src/resources/tabuleiro.fxml</file>
+            <file>file:/C:/Users/jpvs0/Desktop/CURSOS/GITHUB/JogoDeXadrexJavaFx/JogoDeXadrezJavaFx/src/jogodexadrezjavafx/Main.java</file>
+            <file>file:/C:/Users/jpvs0/Desktop/CURSOS/GITHUB/JogoDeXadrexJavaFx/JogoDeXadrezJavaFx/src/jogodexadrezjavafx/HomeController.java</file>
+            <file>file:/C:/Users/jpvs0/Desktop/CURSOS/GITHUB/JogoDeXadrexJavaFx/JogoDeXadrezJavaFx/src/resources/Home.fxml</file>
+            <file>file:/C:/Users/jpvs0/Desktop/CURSOS/GITHUB/JogoDeXadrexJavaFx/JogoDeXadrezJavaFx/src/resources/tabuleiro.fxml</file>
+            <file>file:/C:/Users/jpvs0/Desktop/CURSOS/GITHUB/JogoDeXadrexJavaFx/JogoDeXadrezJavaFx/src/jogodexadrezjavafx/Controller.java</file>
+            <file>file:/C:/Users/jpvs0/Desktop/CURSOS/GITHUB/JogoDeXadrexJavaFx/JogoDeXadrezJavaFx/src/jogodexadrezjavafx/Tabuleiro.java</file>
         </group>
     </open-files>
 </project-private>

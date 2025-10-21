@@ -462,11 +462,9 @@
             </StackPane>
          </children>
       </GridPane>
-      <!-- Este é o Pane para a interface do usuário. Ele fica em uma camada acima do tabuleiro -->
-      <!-- pickOnBounds="false" faz com que ele seja "invisível" para cliques do mouse -->
       <Pane fx:id="uiPane" pickOnBounds="false" prefHeight="373.0" prefWidth="559.0">
          <children>
-            <Pane fx:id="btnVoltar" layoutX="90.0" layoutY="33.0" prefHeight="99.0" prefWidth="279.0" style="-fx-background-color: #786666; -fx-background-radius: 50;">
+            <Pane fx:id="btnVoltar" layoutX="90.0" layoutY="33.0" onMouseClicked="#voltarParaHome" prefHeight="99.0" prefWidth="279.0" style="-fx-background-color: #786666; -fx-background-radius: 50;">
                <children>
                   <Text fill="WHITE" layoutX="70.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Voltar" textAlignment="CENTER">
                      <font>

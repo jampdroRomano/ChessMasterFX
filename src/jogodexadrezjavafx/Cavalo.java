@@ -8,8 +8,16 @@ public class Cavalo extends Peca {
         super(cor);
     }
 
+    // Método principal que retorna movimentos LÍQUIDOS (filtrados)
     @Override
     public List<Casa> getMovimentosPossiveis(Casa origem, Tabuleiro tabuleiro) {
+        List<Casa> movimentos = getMovimentosPossiveisSemFiltro(origem, tabuleiro); // Pega os brutos
+        return tabuleiro.filtrarMovimentosLegais(movimentos, origem, this); // Filtra
+    }
+
+    // Método que retorna movimentos BRUTOS (sem filtro)
+    @Override
+    public List<Casa> getMovimentosPossiveisSemFiltro(Casa origem, Tabuleiro tabuleiro) {
         List<Casa> movimentos = new ArrayList<>();
         int linha = origem.getLinha();
         int coluna = origem.getColuna();
@@ -33,7 +41,6 @@ public class Cavalo extends Peca {
                 }
             }
         }
-        return movimentos;
+        return movimentos; // Retorna a lista BRUTA
     }
 }
-
