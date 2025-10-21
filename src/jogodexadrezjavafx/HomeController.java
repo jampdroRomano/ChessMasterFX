@@ -29,7 +29,6 @@ public class HomeController {
 
         if (screenBounds.getWidth() > telaGrandeLargura) {
             if (controllerDoTabuleiro != null) {
-                // A lógica de adaptação para telas grandes é mantida
                 controllerDoTabuleiro.aplicarEscalaParaTelaGrande();
             }
         }
@@ -38,11 +37,9 @@ public class HomeController {
         Stage window = (Stage)((Node)event.getSource()).getScene().getWindow();
 
         window.setScene(tabuleiroScene);
-        
-        // Permite que a janela do jogo seja redimensionada
+
         window.setResizable(true); 
-        
-        // NOVA LINHA: Faz com que a janela inicie maximizada
+
         window.setMaximized(true);
         
         window.show();
