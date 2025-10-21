@@ -11,70 +11,68 @@ public class Peao extends Peca {
 
     @Override
     public List<Casa> getMovimentosPossiveis(Casa casaAtual, Tabuleiro tabuleiro) {
-        List<Casa> movimentos = getMovimentosPossiveisSemFiltro(casaAtual, tabuleiro);
-        return tabuleiro.filtrarMovimentosLegais(movimentos, casaAtual, this);
-    }
-
-    @Override
-    public List<Casa> getMovimentosPossiveisSemFiltro(Casa casaAtual, Tabuleiro tabuleiro) {
         List<Casa> movimentos = new ArrayList<>();
         int linha = casaAtual.getLinha();
         int coluna = casaAtual.getColuna();
 
         if (getCor() == Cor.BRANCA) {
-           
+            // --- Movimento para a frente ---
             if (linha > 0) {
                 Casa casaFrente = tabuleiro.getCasa(linha - 1, coluna);
-                if (casaFrente != null && !casaFrente.temPeca()) { 
+                if (casaFrente != null && casaFrente.getPeca() == null) {
                     movimentos.add(casaFrente);
-
-                    if (!tabuleiro.isPrimeiroMovimentoBrancasFeito() && linha == 6) { 
+                    
+                    // --- Movimento duplo customizado ---
+                    // Verifica se é o primeiro movimento das brancas na partida
+                    if (!tabuleiro.isPrimeiroMovimentoBrancasFeito()) {
                         Casa casaDupla = tabuleiro.getCasa(linha - 2, coluna);
-                        if (casaDupla != null && !casaDupla.temPeca()) {
+                        if (casaDupla != null && casaDupla.getPeca() == null) {
                             movimentos.add(casaDupla);
                         }
                     }
                 }
             }
-
-          
-            if (linha > 0 && coluna > 0) { 
+            
+            // --- Captura diagonal ---
+            if (linha > 0 && coluna > 0) { // Diagonal esquerda
                 Casa casaCaptura = tabuleiro.getCasa(linha - 1, coluna - 1);
                 if (casaCaptura != null && casaCaptura.temPeca() && casaCaptura.getPeca().getCor() != this.getCor()) {
                     movimentos.add(casaCaptura);
                 }
             }
-            if (linha > 0 && coluna < 7) {
+            if (linha > 0 && coluna < 7) { // Diagonal direita
                 Casa casaCaptura = tabuleiro.getCasa(linha - 1, coluna + 1);
                 if (casaCaptura != null && casaCaptura.temPeca() && casaCaptura.getPeca().getCor() != this.getCor()) {
                     movimentos.add(casaCaptura);
                 }
             }
 
-        } else { 
+        } else { // PEÇAS PRETAS
+            // --- Movimento para a frente ---
              if (linha < 7) {
                 Casa casaFrente = tabuleiro.getCasa(linha + 1, coluna);
-
-                if (casaFrente != null && !casaFrente.temPeca()) { 
+                if (casaFrente != null && casaFrente.getPeca() == null) {
                     movimentos.add(casaFrente);
 
-                    if (!tabuleiro.isPrimeiroMovimentoPretasFeito() && linha == 1) { 
+                    // --- Movimento duplo customizado ---
+                    // Verifica se é o primeiro movimento das pretas na partida
+                    if (!tabuleiro.isPrimeiroMovimentoPretasFeito()) {
                         Casa casaDupla = tabuleiro.getCasa(linha + 2, coluna);
-                        if (casaDupla != null && !casaDupla.temPeca()) {
+                        if (casaDupla != null && casaDupla.getPeca() == null) {
                             movimentos.add(casaDupla);
                         }
                     }
                 }
             }
-
-           
-            if (linha < 7 && coluna > 0) { 
+            
+            // --- Captura diagonal ---
+            if (linha < 7 && coluna > 0) { // Diagonal esquerda
                 Casa casaCaptura = tabuleiro.getCasa(linha + 1, coluna - 1);
                 if (casaCaptura != null && casaCaptura.temPeca() && casaCaptura.getPeca().getCor() != this.getCor()) {
                     movimentos.add(casaCaptura);
                 }
             }
-            if (linha < 7 && coluna < 7) { 
+            if (linha < 7 && coluna < 7) { // Diagonal direita
                 Casa casaCaptura = tabuleiro.getCasa(linha + 1, coluna + 1);
                 if (casaCaptura != null && casaCaptura.temPeca() && casaCaptura.getPeca().getCor() != this.getCor()) {
                     movimentos.add(casaCaptura);
@@ -82,6 +80,7 @@ public class Peao extends Peca {
             }
         }
 
-        return movimentos; 
+        return movimentos;
     }
 }
+
