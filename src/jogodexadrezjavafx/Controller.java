@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -28,7 +29,6 @@ public class Controller {
 
     @FXML private GridPane gridPaneTabuleiro;
     @FXML private StackPane rootPane;
-
     @FXML private StackPane a1, b1, c1, d1, e1, f1, g1, h1;
     @FXML private StackPane a2, b2, c2, d2, e2, f2, g2, h2;
     @FXML private StackPane a3, b3, c3, d3, e3, f3, g3, h3;
@@ -37,7 +37,6 @@ public class Controller {
     @FXML private StackPane a6, b6, c6, d6, e6, f6, g6, h6;
     @FXML private StackPane a7, b7, c7, d7, e7, f7, g7, h7;
     @FXML private StackPane a8, b8, c8, d8, e8, f8, g8, h8;
-
     @FXML private Pane uiPane;
     @FXML private Pane btnVoltar;
 
@@ -48,14 +47,14 @@ public class Controller {
     private List<Casa> movimentosPossiveis = new ArrayList<>();
     private boolean jogoAcabou = false;
 
-    private int vitoriasBrancas = 0;
-    private int vitoriasPretas = 0;
+    private boolean contraBot = false;
+    private Bot bot;
+    private boolean processandoJogadaBot = false;
 
     private final Map<Casa, StackPane> mapaCasaParaStackPane = new HashMap<>();
     private final Map<StackPane, Casa> mapaStackPaneParaCasa = new HashMap<>();
     private final List<Node> destaquesMovimento = new ArrayList<>();
     private final Map<StackPane, String> estilosOriginais = new HashMap<>();
-
     private StackPane reiEmChequeDestacado = null;
 
     @FXML
@@ -66,6 +65,20 @@ public class Controller {
         atualizarDestaqueCheque();
     }
 
+    public void ativarJogoContraBot(Bot.NivelDificuldade nivel) {
+        this.contraBot = true;
+        this.bot = new Bot(this.tabuleiro, Cor.PRETA, nivel);
+        System.out.println("Modo de jogo: Player vs Bot (Nível: " + nivel + ")");
+    }
+
+    public void setModoJogo(boolean contraBot) {
+        this.contraBot = contraBot;
+        if (!contraBot) {
+            this.bot = null;
+            System.out.println("Modo de jogo: Player vs Player");
+        }
+    }
+    
     public void aplicarEscalaParaTelaGrande() {
         double fatorEscala = 1.6;
         if(gridPaneTabuleiro != null){
@@ -100,7 +113,9 @@ public class Controller {
     }
 
     private void onCasaClicked(StackPane spClicado) {
-        if (jogoAcabou) return;
+        if (jogoAcabou || processandoJogadaBot || (contraBot && turnoAtual != Cor.BRANCA)) {
+            return;
+        }
 
         Casa casaClicada = mapaStackPaneParaCasa.get(spClicado);
         if (casaClicada == null) return;
@@ -116,13 +131,14 @@ public class Controller {
                 if (!jogoAcabou) {
                     trocarTurno();
                     atualizarDestaqueCheque();
+                    if (contraBot && turnoAtual == bot.getCorDoBot()) {
+                        dispararJogadaDoBot();
+                    }
                 }
             } else {
                 limparSelecao();
                 if (casaClicada.temPeca() && casaClicada.getPeca().getCor() == turnoAtual) {
                     selecionarPeca(casaClicada);
-                } else {
-                     atualizarDestaqueCheque();
                 }
             }
         } else {
@@ -130,6 +146,35 @@ public class Controller {
                 selecionarPeca(casaClicada);
             }
         }
+    }
+
+    private void dispararJogadaDoBot() {
+        processandoJogadaBot = true;
+        if (gridPaneTabuleiro != null) gridPaneTabuleiro.setMouseTransparent(true);
+        System.out.println("Bot (" + bot.getCorDoBot() + ", Nível: " + bot.getNivel() + ") está pensando...");
+
+        new Thread(() -> {
+            Movimento jogadaDoBot = bot.calcularMelhorMovimento();
+
+            Platform.runLater(() -> {
+                if (jogadaDoBot != null) {
+                    System.out.println("Bot jogou: " + jogadaDoBot);
+                    Peca pecaCapturada = jogadaDoBot.getDestino().getPeca();
+                    boolean promocao = tabuleiro.moverPeca(jogadaDoBot.getOrigem(), jogadaDoBot.getDestino());
+                    moverPecaVisualmente(jogadaDoBot.getOrigem(), jogadaDoBot.getDestino(), promocao);
+                    verificarFimDeJogoAposMovimento(pecaCapturada);
+
+                    if (!jogoAcabou) {
+                        trocarTurno();
+                        atualizarDestaqueCheque();
+                    }
+                } else {
+                     verificarFimDeJogoAposMovimento(null); 
+                }
+                processandoJogadaBot = false;
+                if (gridPaneTabuleiro != null) gridPaneTabuleiro.setMouseTransparent(false);
+            });
+        }).start();
     }
 
     private void selecionarPeca(Casa casa) {
@@ -170,17 +215,26 @@ public class Controller {
         if (spDestino != null) {
             spDestino.getChildren().removeIf(node -> node instanceof ImageView);
             if (pecaVisual != null) {
+                if(pecaVisual.getParent() != null) ((Pane)pecaVisual.getParent()).getChildren().remove(pecaVisual);
                 spDestino.getChildren().add(pecaVisual);
             } else {
-                 System.err.println("Erro visual: Não foi possível adicionar pecaVisual (nula) ao destino: (" + destino.getLinha() + "," + destino.getColuna() + ")");
+                System.err.println("Erro visual: Não foi possível adicionar pecaVisual (nula) ao destino: (" + destino.getLinha() + "," + destino.getColuna() + "). Tentando recriar.");
+                String nomePeca = pecaMovida.getClass().getSimpleName();
+                String corPeca = (pecaMovida.getCor() == Cor.BRANCA) ? "Branca" : "Preta";
+                String caminhoRecurso = "resources/imagens/Peca" + nomePeca + corPeca + ".png";
+                try(InputStream is = Controller.class.getClassLoader().getResourceAsStream(caminhoRecurso)){
+                    if(is != null){
+                        Image img = new Image(is);
+                        ImageView iv = new ImageView(img);
+                        iv.setFitHeight(70.0); iv.setFitWidth(70.0); iv.setPreserveRatio(true); iv.setMouseTransparent(true);
+                        spDestino.getChildren().add(iv);
+                    }
+                } catch (Exception e) {}
             }
-        } else {
-             System.err.println("Erro visual: StackPane de destino não encontrado para (" + destino.getLinha() + "," + destino.getColuna() + ")");
         }
 
         boolean isRoque = pecaMovida instanceof Rei && Math.abs(destino.getColuna() - origem.getColuna()) == 2;
         if (isRoque) {
-            System.out.println("Movendo visualmente a Torre para o Roque...");
             int linha = origem.getLinha();
             int colunaTorreOrigemIdx = (destino.getColuna() == 6) ? 7 : 0;
             int colunaTorreDestinoIdx = (destino.getColuna() == 6) ? 5 : 3;
@@ -188,75 +242,34 @@ public class Controller {
             StackPane spTorreOrigem = mapaCasaParaStackPane.get(casaTorreOrigem);
             Casa casaTorreDestino = tabuleiro.getCasa(linha, colunaTorreDestinoIdx);
             StackPane spTorreDestino = mapaCasaParaStackPane.get(casaTorreDestino);
-            ImageView imgTorre = null;
-
-            if (spTorreOrigem != null) {
-                Optional<Node> foundTorre = spTorreOrigem.getChildren().stream()
-                   .filter(node -> node instanceof ImageView).findFirst();
-                if (foundTorre.isPresent()) {
-                    imgTorre = (ImageView) foundTorre.get();
-                    spTorreOrigem.getChildren().remove(imgTorre);
-                     System.out.println("  > Imagem da torre removida da origem visual (" + linha + "," + colunaTorreOrigemIdx + ")");
-                } else {
-                     System.err.println("  > Aviso visual Roque: Imagem da torre não encontrada na casa de origem visual (" + linha + "," + colunaTorreOrigemIdx + "). Limpando.");
-                     spTorreOrigem.getChildren().removeIf(node -> node instanceof ImageView);
-                }
-            } else {
-                 System.err.println("  > Erro visual Roque: StackPane de ORIGEM da torre nulo.");
-            }
-
-            if (spTorreDestino != null) {
+            
+            Optional<Node> foundTorre = spTorreOrigem.getChildren().stream().filter(node -> node instanceof ImageView).findFirst();
+            if (foundTorre.isPresent()) {
+                ImageView imgTorre = (ImageView) foundTorre.get();
+                spTorreOrigem.getChildren().remove(imgTorre);
                 spTorreDestino.getChildren().removeIf(node -> node instanceof ImageView);
-                if (imgTorre != null) {
-                    if(imgTorre.getParent() != null) ((Pane)imgTorre.getParent()).getChildren().remove(imgTorre);
-                    spTorreDestino.getChildren().add(imgTorre);
-                    System.out.println("  > Imagem da torre adicionada ao destino visual (" + linha + "," + colunaTorreDestinoIdx + ")");
-                } else {
-                     System.err.println("  > Erro visual Roque: Imagem da torre nula. Não pode adicionar ao destino visual.");
-                     Peca torreLogica = casaTorreDestino.getPeca();
-                     if(torreLogica instanceof Torre){
-                          String corTorre = (torreLogica.getCor() == Cor.BRANCA) ? "Branca" : "Preta";
-                          String caminhoTorre = "resources/imagens/PecaTorre" + corTorre + ".png";
-                          try(InputStream is = Controller.class.getClassLoader().getResourceAsStream(caminhoTorre)){
-                               if(is != null){
-                                    Image img = new Image(is);
-                                    ImageView iv = new ImageView(img);
-                                    iv.setFitHeight(70.0); iv.setFitWidth(70.0); iv.setPreserveRatio(true); iv.setMouseTransparent(true);
-                                    spTorreDestino.getChildren().add(iv);
-                                    System.out.println("  > Fallback: Imagem da torre RECRIADA e adicionada.");
-                               } else { System.err.println("  > Fallback falhou: Recurso da torre não encontrado em " + caminhoTorre);}
-                          } catch (Exception e) { System.err.println("  > Fallback de imagem da torre falhou com exceção: " + e.getMessage());}
-                     }
-                }
-            } else {
-                System.err.println("  > Erro visual Roque: StackPane de DESTINO da torre nulo.");
+                spTorreDestino.getChildren().add(imgTorre);
             }
         }
 
-        if(promocaoOcorreuLogica && pecaVisual != null && pecaMovida instanceof Rainha){
-            System.out.println("Atualizando imagem visual para Promoção!");
-            String caminhoImagemRainha = (pecaMovida.getCor() == Cor.BRANCA)
+        if(promocaoOcorreuLogica && destino.getPeca() instanceof Rainha){
+            String caminhoImagemRainha = (destino.getPeca().getCor() == Cor.BRANCA)
                 ? "/resources/imagens/PecaRainhaBranca.png"
                 : "/resources/imagens/PecaRainhaPreta.png";
             try (InputStream is = getClass().getResourceAsStream(caminhoImagemRainha)) {
-                 if (is == null) {
-                    System.err.println("Erro CRÍTICO ao carregar imagem visual da rainha para promoção: Recurso não encontrado em " + caminhoImagemRainha);
-                 } else {
+                 if (is != null) {
                      Image novaImagem = new Image(is);
-                     if (novaImagem.isError()) {
-                        System.err.println("Erro ao decodificar imagem visual da rainha: " + caminhoImagemRainha);
-                         if(novaImagem.getException() != null) novaImagem.getException().printStackTrace();
-                     } else {
-                         pecaVisual.setImage(novaImagem);
+                     ImageView imageViewNoDestino = (ImageView) spDestino.getChildren().stream()
+                        .filter(node -> node instanceof ImageView).findFirst().orElse(null);
+                     if(imageViewNoDestino != null) {
+                         imageViewNoDestino.setImage(novaImagem);
                      }
                  }
             } catch (Exception e) {
-                System.err.println("Exceção geral ao carregar imagem visual da rainha para promoção: " + e.getMessage());
                 e.printStackTrace();
             }
         }
     }
-
 
     private void verificarFimDeJogoAposMovimento(Peca pecaCapturada) {
         Cor corOponente = (turnoAtual == Cor.BRANCA) ? Cor.PRETA : Cor.BRANCA;
@@ -266,122 +279,48 @@ public class Controller {
 
         if (pecaCapturada instanceof Rei) {
             vencedor = (turnoAtual == Cor.BRANCA) ? "BRANCAS" : "PRETAS";
-            System.out.println("Vitória por captura do Rei!");
-            if ("BRANCAS".equals(vencedor)) vitoriasBrancas++; else vitoriasPretas++;
-        }
-        else if (tabuleiro.getContadorChecksBrancas() >= 3) {
+        } else if (tabuleiro.getContadorChecksBrancas() >= 3) {
             vencedor = "PRETAS";
-            System.out.println("Vitória das PRETAS por 3 cheques!");
-            vitoriasPretas++;
         } else if (tabuleiro.getContadorChecksPretas() >= 3) {
             vencedor = "BRANCAS";
-            System.out.println("Vitória das BRANCAS por 3 cheques!");
-            vitoriasBrancas++;
-        }
-        else if (tabuleiro.isXequeMate(corOponente)) {
+        } else if (tabuleiro.isXequeMate(corOponente)) {
             vencedor = (turnoAtual == Cor.BRANCA) ? "BRANCAS" : "PRETAS";
-            System.out.println("Vitória por Xeque-mate!");
-             if ("BRANCAS".equals(vencedor)) vitoriasBrancas++; else vitoriasPretas++;
+        } else if (!temMovimentosLegais(corOponente)) {
+             vencedor = "EMPATE por Afogamento";
         }
-
 
         if (vencedor != null) {
             jogoAcabou = true;
-            atualizarDestaqueCheque();
             mostrarDialogoFimDeJogo(vencedor);
         }
     }
 
-
-    private void mostrarDialogoFimDeJogo(String vencedor) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Fim de Jogo!");
-        alert.setHeaderText("As " + vencedor + " venceram!");
-        alert.setContentText(null);
-
-        Node nodeParaStage = gridPaneTabuleiro != null ? gridPaneTabuleiro : btnVoltar;
-         if(nodeParaStage == null && rootPane != null) nodeParaStage = rootPane;
-
-        alert.showAndWait();
-
-        if (nodeParaStage != null && nodeParaStage.getScene() != null) {
-            irParaTelaHome(nodeParaStage);
-        } else {
-            System.err.println("Erro: Não foi possível obter um Node válido para retornar à tela Home após o diálogo.");
-            if (gridPaneTabuleiro != null) gridPaneTabuleiro.setDisable(true);
-            if (btnVoltar != null) btnVoltar.setDisable(true);
-        }
-    }
-
-    private void reiniciarJogoInternamente() {
-        System.out.println("Iniciando reinício interno do jogo...");
-        tabuleiro.reset();
-        turnoAtual = Cor.BRANCA;
-        pecaSelecionada = null;
-        casaOrigem = null;
-        movimentosPossiveis.clear();
-        jogoAcabou = false;
-
-        for (Map.Entry<Casa, StackPane> entry : mapaCasaParaStackPane.entrySet()) {
-            Casa casa = entry.getKey();
-            StackPane sp = entry.getValue();
-            if (sp == null) continue;
-
-            sp.getChildren().removeIf(node -> !(node instanceof javafx.scene.control.Label));
-            sp.setStyle(estilosOriginais.get(sp));
-
-            if (casa.temPeca()) {
-                Peca peca = casa.getPeca();
-                String nomePeca = peca.getClass().getSimpleName();
-                String corPeca = (peca.getCor() == Cor.BRANCA) ? "Branca" : "Preta";
-                String caminhoRecurso = "resources/imagens/Peca" + nomePeca + corPeca + ".png";
-
-                Image imagemPeca = null;
-                InputStream is = null;
-
-                try {
-                     is = Controller.class.getClassLoader().getResourceAsStream(caminhoRecurso);
-
-                    if (is == null) {
-                        System.err.println("Erro CRÍTICO ao carregar imagem: Recurso NÃO ENCONTRADO em '" + caminhoRecurso + "'.");
-                        System.err.println("Verifique:");
-                        System.err.println("1. Se o arquivo existe EXATAMENTE com este nome (maiúsculas/minúsculas) em 'src/resources/imagens/'.");
-                        System.err.println("2. Se a pasta 'resources' está diretamente dentro de 'src'.");
-                        System.err.println("3. Se o arquivo foi copiado para 'build/classes/resources/imagens/' após a compilação.");
-                    } else {
-                        imagemPeca = new Image(is);
-                        if (imagemPeca.isError()) {
-                            System.err.println("Erro ao decodificar imagem: " + caminhoRecurso);
-                            if(imagemPeca.getException() != null) imagemPeca.getException().printStackTrace();
-                        } else {
-                            ImageView imageView = new ImageView(imagemPeca);
-                            imageView.setFitHeight(70.0);
-                            imageView.setFitWidth(70.0);
-                            imageView.setPreserveRatio(true);
-                            imageView.setMouseTransparent(true);
-                            sp.getChildren().add(imageView);
-                        }
-                    }
-                } catch (Exception e) {
-                    System.err.println("Exceção geral ao recarregar imagem (" + caminhoRecurso + "): " + e.getMessage());
-                    e.printStackTrace();
-                } finally {
-                    if (is != null) {
-                        try {
-                            is.close();
-                        } catch (IOException e) { /* Ignora */ }
-                    }
-                }
+    private boolean temMovimentosLegais(Cor cor) {
+        List<Tabuleiro.PecaComPosicao> pecas = tabuleiro.getTodasPecas(cor);
+        for (Tabuleiro.PecaComPosicao pcp : pecas) {
+            if (!pcp.peca.getMovimentosPossiveis(pcp.casa, tabuleiro).isEmpty()) {
+                return true;
             }
         }
+        return false;
+    }
 
-        if (gridPaneTabuleiro != null) gridPaneTabuleiro.setDisable(false);
-        if (btnVoltar != null) btnVoltar.setDisable(false);
-
-        limparDestaques();
-        reiEmChequeDestacado = null;
-        atualizarDestaqueCheque();
-        System.out.println("Jogo reiniciado (interno). Turno das: " + turnoAtual);
+    private void mostrarDialogoFimDeJogo(String resultado) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Fim de Jogo!");
+        if (resultado.contains("EMPATE")) {
+             alert.setHeaderText(resultado);
+        } else {
+             alert.setHeaderText("As " + resultado + " venceram!");
+        }
+        alert.setContentText(null);
+        
+        alert.showAndWait();
+        
+        Node nodeParaStage = gridPaneTabuleiro != null ? gridPaneTabuleiro : btnVoltar;
+        if (nodeParaStage != null) {
+            irParaTelaHome(nodeParaStage);
+        }
     }
 
     private void limparSelecao() {
@@ -400,31 +339,24 @@ public class Controller {
 
     private void mostrarDestaques() {
         limparDestaques();
-
         StackPane spOrigem = mapaCasaParaStackPane.get(casaOrigem);
         if (spOrigem != null) {
-            String estiloOriginal = estilosOriginais.get(spOrigem);
-            spOrigem.setStyle(estiloOriginal + "; -fx-border-color: yellow; -fx-border-width: 3; -fx-border-radius: 5;");
+            spOrigem.setStyle(estilosOriginais.get(spOrigem) + "; -fx-border-color: yellow; -fx-border-width: 3; -fx-border-radius: 5;");
             destaquesMovimento.add(spOrigem);
         }
-
         for (Casa casaDestino : movimentosPossiveis) {
             StackPane spDestino = mapaCasaParaStackPane.get(casaDestino);
             if (spDestino != null) {
                  Node destaque;
-                 boolean temPecaOponente = casaDestino.temPeca() && casaDestino.getPeca().getCor() != turnoAtual;
-
-                 if (temPecaOponente) {
-                     Circle circuloCaptura = new Circle(25, Color.rgb(180, 0, 0, 0.4));
-                     circuloCaptura.setStroke(Color.DARKRED);
-                     circuloCaptura.setStrokeWidth(2);
-                     circuloCaptura.setMouseTransparent(true);
-                     destaque = circuloCaptura;
+                 if (casaDestino.temPeca()) {
+                     Circle c = new Circle(30, Color.TRANSPARENT);
+                     c.setStroke(Color.rgb(200, 0, 0, 0.7));
+                     c.setStrokeWidth(4);
+                     destaque = c;
                  } else {
-                     Circle circuloNormal = new Circle(15, Color.rgb(128, 128, 128, 0.5));
-                     circuloNormal.setMouseTransparent(true);
-                     destaque = circuloNormal;
+                     destaque = new Circle(15, Color.rgb(0, 0, 0, 0.3));
                  }
+                destaque.setMouseTransparent(true);
                 destaquesMovimento.add(destaque);
                 spDestino.getChildren().add(destaque);
             }
@@ -455,19 +387,18 @@ public class Controller {
             reiEmChequeDestacado = null;
         }
 
-        Casa reiEmCheque = null;
-        if (tabuleiro.isReiEmCheque(Cor.BRANCA)) {
-            reiEmCheque = tabuleiro.getCasaDoRei(Cor.BRANCA);
-        } else if (tabuleiro.isReiEmCheque(Cor.PRETA)) {
-            reiEmCheque = tabuleiro.getCasaDoRei(Cor.PRETA);
+        Casa reiBranco = tabuleiro.getCasaDoRei(Cor.BRANCA);
+        if (reiBranco != null && tabuleiro.isReiEmCheque(Cor.BRANCA)) {
+            reiEmChequeDestacado = mapaCasaParaStackPane.get(reiBranco);
         }
 
-        if (reiEmCheque != null) {
-            StackPane spRei = mapaCasaParaStackPane.get(reiEmCheque);
-            if (spRei != null) {
-                spRei.setStyle(estilosOriginais.get(spRei) + "; -fx-border-color: red; -fx-border-width: 3; -fx-border-radius: 5;");
-                reiEmChequeDestacado = spRei;
-            }
+        Casa reiPreto = tabuleiro.getCasaDoRei(Cor.PRETA);
+        if (reiPreto != null && tabuleiro.isReiEmCheque(Cor.PRETA)) {
+            reiEmChequeDestacado = mapaCasaParaStackPane.get(reiPreto);
+        }
+        
+        if (reiEmChequeDestacado != null) {
+            reiEmChequeDestacado.setStyle(estilosOriginais.get(reiEmChequeDestacado) + "; -fx-border-color: red; -fx-border-width: 3; -fx-border-radius: 5;");
         }
     }
 
@@ -475,21 +406,8 @@ public class Controller {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/resources/Home.fxml"));
             Parent homeRoot = loader.load();
-            Stage stage = null;
-            if (nodeOrigem != null && nodeOrigem.getScene() != null) {
-                 stage = (Stage) nodeOrigem.getScene().getWindow();
-            } else {
-                 System.err.println("Não foi possível obter o Stage a partir do Node. Tentando pelo gridPane.");
-                 if (gridPaneTabuleiro != null && gridPaneTabuleiro.getScene() != null) {
-                     stage = (Stage) gridPaneTabuleiro.getScene().getWindow();
-                 }
-            }
-
-            if (stage == null) {
-                 System.err.println("Falha crítica: Não foi possível obter o Stage para voltar ao menu.");
-                 return;
-            }
-
+            Stage stage = (Stage) nodeOrigem.getScene().getWindow();
+            
             Scene homeScene = new Scene(homeRoot, 970, 630);
             stage.setScene(homeScene);
             stage.setResizable(false);
@@ -499,19 +417,12 @@ public class Controller {
             stage.centerOnScreen();
             stage.show();
         } catch (IOException e) {
-            System.err.println("Erro ao carregar a tela Home: " + e.getMessage());
             e.printStackTrace();
-        } catch (NullPointerException e) {
-             System.err.println("Erro: Não foi possível encontrar o arquivo FXML Home.fxml. Verifique o caminho: /resources/Home.fxml - " + e.getMessage());
-             e.printStackTrace();
-        } catch (Exception e) {
-             System.err.println("Ocorreu um erro inesperado ao voltar para Home: " + e.getMessage());
-             e.printStackTrace();
         }
     }
 
     @FXML
     private void voltarParaHome(MouseEvent event) {
-         irParaTelaHome((Node) event.getSource());
+        irParaTelaHome((Node) event.getSource());
     }
 }

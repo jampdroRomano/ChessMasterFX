@@ -26,8 +26,11 @@ public abstract class Peca {
         this.jaMoveu = false;
     }
 
+    public void resetMoveu() {
+        this.jaMoveu = false;
+    }
+
     public abstract List<Casa> getMovimentosPossiveis(Casa casaAtual, Tabuleiro tabuleiro);
 
     public abstract List<Casa> getMovimentosPossiveisSemFiltro(Casa casaAtual, Tabuleiro tabuleiro);
-
 }

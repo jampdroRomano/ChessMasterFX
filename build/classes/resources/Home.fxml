@@ -11,12 +11,12 @@
    <children>
       <Pane layoutX="-1.0" layoutY="451.0" prefHeight="178.0" prefWidth="971.0" style="-fx-background-color: #252422;">
          <children>
-            <Button fx:id="btnJogarLocal" layoutX="181.0" layoutY="52.0" mnemonicParsing="false" onAction="#iniciarJogoLocal" prefHeight="20.0" prefWidth="300.0" style="-fx-background-color: #786666; -fx-effect: innershadow(gaussian, #786666, 15, 0.7, 0, 3);;" text="Jogar 2P Local" textFill="WHITE">
+            <Button fx:id="btnJogarLocal" layoutX="181.0" layoutY="52.0" mnemonicParsing="false" onAction="#iniciarJogoLocal" prefHeight="75.0" prefWidth="300.0" style="-fx-background-color: #786666; -fx-effect: innershadow(gaussian, #786666, 15, 0.7, 0, 3);;" text="Jogar 2P Local" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>
             </Button>
-            <Button layoutX="493.0" layoutY="52.0" mnemonicParsing="false" prefHeight="20.0" prefWidth="300.0" style="-fx-background-color: #786666; -fx-effect: innershadow(gaussian, #786666, 15, 0.7, 0, 3);;" text="Jogar com Bot" textFill="WHITE">
+            <Button fx:id="btnJogarComBot" layoutX="493.0" layoutY="52.0" mnemonicParsing="false" onAction="#iniciarJogoComBot" prefHeight="75.0" prefWidth="300.0" style="-fx-background-color: #786666; -fx-effect: innershadow(gaussian, #786666, 15, 0.7, 0, 3);;" text="Jogar com Bot" textFill="WHITE">
                <font>
                   <Font size="24.0" />
                </font>

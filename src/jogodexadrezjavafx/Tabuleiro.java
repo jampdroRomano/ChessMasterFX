@@ -2,23 +2,41 @@ package jogodexadrezjavafx;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class Tabuleiro {
 
     private final Casa[][] casas;
-
     private boolean primeiroMovimentoBrancasFeito;
     private boolean primeiroMovimentoPretasFeito;
-
     private int contadorChecksBrancas = 0;
     private int contadorChecksPretas = 0;
+    
+    public static class PecaComPosicao {
+        public Peca peca;
+        public Casa casa;
+        public PecaComPosicao(Peca p, Casa c) {
+            this.peca = p;
+            this.casa = c;
+        }
+    }
 
     public Tabuleiro() {
         casas = new Casa[8][8];
         inicializarTabuleiro();
     }
-
+    
+    public List<PecaComPosicao> getTodasPecas(Cor cor) {
+        List<PecaComPosicao> pecas = new ArrayList<>();
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                if (casas[i][j].temPeca() && casas[i][j].getPeca().getCor() == cor) {
+                    pecas.add(new PecaComPosicao(casas[i][j].getPeca(), casas[i][j]));
+                }
+            }
+        }
+        return pecas;
+    }
+    
     public void reset() {
         contadorChecksBrancas = 0;
         contadorChecksPretas = 0;
@@ -30,10 +48,8 @@ public class Tabuleiro {
     private void inicializarTabuleiro() {
         primeiroMovimentoBrancasFeito = false;
         primeiroMovimentoPretasFeito = false;
-        // Zera os contadores no início também
         contadorChecksBrancas = 0;
         contadorChecksPretas = 0;
-
 
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
@@ -44,7 +60,7 @@ public class Tabuleiro {
                 }
             }
         }
-        // Peças Pretas
+
         casas[0][0].setPeca(new Torre(Cor.PRETA));
         casas[0][1].setPeca(new Cavalo(Cor.PRETA));
         casas[0][2].setPeca(new Bispo(Cor.PRETA));
@@ -56,7 +72,7 @@ public class Tabuleiro {
         for (int j = 0; j < 8; j++) {
             casas[1][j].setPeca(new Peao(Cor.PRETA));
         }
-        // Peças Brancas
+
         casas[7][0].setPeca(new Torre(Cor.BRANCA));
         casas[7][1].setPeca(new Cavalo(Cor.BRANCA));
         casas[7][2].setPeca(new Bispo(Cor.BRANCA));
@@ -155,25 +171,6 @@ public class Tabuleiro {
         return primeiroMovimentoPretasFeito;
     }
 
-    public Casa moverTorreRoque(Casa destinoRei) {
-        int linha = destinoRei.getLinha();
-        if (destinoRei.getColuna() == 6 || destinoRei.getColuna() == 2) {
-             int colunaTorreOrigem = (destinoRei.getColuna() == 6) ? 7 : 0;
-             int colunaTorreDestino = (destinoRei.getColuna() == 6) ? 5 : 3;
-
-             Casa casaTorreOrigem = getCasa(linha, colunaTorreOrigem);
-             Casa casaTorreDestino = getCasa(linha, colunaTorreDestino);
-             if (casaTorreOrigem != null && casaTorreOrigem.temPeca() && casaTorreOrigem.getPeca() instanceof Torre && casaTorreOrigem.getPeca().isPrimeiroMovimento() && casaTorreDestino != null) {
-                Peca torre = casaTorreOrigem.getPeca();
-                casaTorreDestino.setPeca(torre);
-                casaTorreOrigem.removerPeca();
-                torre.registrarMovimento();
-                return casaTorreOrigem;
-             }
-        }
-        return null;
-    }
-
     public void verificarChequeAposMovimento(Cor corDoReiOponente) {
         Casa casaDoReiOponente = getCasaDoRei(corDoReiOponente);
         Cor corAtacante = (corDoReiOponente == Cor.BRANCA) ? Cor.PRETA : Cor.BRANCA;
@@ -225,7 +222,6 @@ public class Tabuleiro {
                     } else if (pecaAtacante instanceof Rei) {
                          movimentosAtaque = ((Rei) pecaAtacante).getMovimentosBasicos(casaAtual, this);
                     } else {
-                        // Usa a versão SEM filtro para verificar ataques potenciais
                         movimentosAtaque = pecaAtacante.getMovimentosPossiveisSemFiltro(casaAtual, this);
                     }
 
@@ -256,15 +252,16 @@ public class Tabuleiro {
 
         for (Casa destino : movimentosBrutos) {
             Peca pecaCapturada = destino.getPeca();
+            boolean eraPrimeiroMovimento = pecaMovida.isPrimeiroMovimento(); 
             destino.setPeca(pecaMovida);
             origem.removerPeca();
+            pecaMovida.registrarMovimento(); 
 
             boolean reiFicariaEmCheque = isReiEmCheque(corJogador);
 
-
             origem.setPeca(pecaMovida);
             destino.setPeca(pecaCapturada);
-
+            if(eraPrimeiroMovimento) pecaMovida.resetMoveu();
             if (!reiFicariaEmCheque) {
                 movimentosLegais.add(destino);
             }
@@ -273,7 +270,6 @@ public class Tabuleiro {
     }
 
     public boolean isXequeMate(Cor corRei) {
-
         if (!isReiEmCheque(corRei)) {
             return false; 
         }
