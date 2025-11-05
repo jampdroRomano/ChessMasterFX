@@ -75,7 +75,6 @@ ChessMasterFX/
 - Execute o projeto utilizando o plugin do Maven para JavaFX:
 ```
 mvn clean javafx:run
-
 ```
 ---
 
