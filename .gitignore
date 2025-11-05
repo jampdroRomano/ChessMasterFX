@@ -1,0 +1,23 @@
+# Maven
+target/
+
+# IDE
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+bin/
+.classpath
+.project
+.settings/
+
+# Logs e outros arquivos gerados
+*.log
+hs_err_pid*
+pom.xml.versionsBackup
+
+# macOS
+.DS_Store
+
