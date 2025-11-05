@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<!-- O StackPane como elemento raiz garante a centralização e a sobreposição -->
+
+<StackPane prefHeight="614.0" prefWidth="958.0" style="-fx-background-color: #3C3535;" xmlns="http://javafx.com/javafx/24.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.chessmaster.fx.controller.Controller">
+   <children>
+      <!-- O GridPane do tabuleiro é o primeiro elemento, ficará centralizado por padrão -->
+      <GridPane fx:id="gridPaneTabuleiro" alignment="CENTER">
+         <!-- O GridPane agora é 8x8 -->
+         <columnConstraints>
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+            <ColumnConstraints halignment="CENTER" prefWidth="75.0" />
+         </columnConstraints>
+         <rowConstraints>
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+            <RowConstraints prefHeight="75.0" valignment="CENTER" />
+         </rowConstraints>
+         <children>
+            <!-- Linha 8 (Peças Pretas) -->
+            <StackPane fx:id="a8" style="-fx-background-color: #eeeed2;">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaTorrePreta.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="8" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b8" style="-fx-background-color: #769656;" GridPane.columnIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaCavaloPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="c8" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="2">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaBispoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="d8" style="-fx-background-color: #769656;" GridPane.columnIndex="3">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaRainhaPreta.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="e8" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="4">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaReiPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="f8" style="-fx-background-color: #769656;" GridPane.columnIndex="5">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaBispoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="g8" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaCavaloPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="h8" style="-fx-background-color: #769656;" GridPane.columnIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaTorrePreta.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <!-- Linha 7 (Peões Pretos) -->
+            <StackPane fx:id="a7" style="-fx-background-color: #769656;" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="7" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b7" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="1" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="c7" style="-fx-background-color: #769656;" GridPane.columnIndex="2" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="d7" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="3" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="e7" style="-fx-background-color: #769656;" GridPane.columnIndex="4" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="f7" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="5" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="g7" style="-fx-background-color: #769656;" GridPane.columnIndex="6" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="h7" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="7" GridPane.rowIndex="1">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoPreto.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <!-- Linha 6 -->
+            <StackPane fx:id="a6" style="-fx-background-color: #eeeed2;" GridPane.rowIndex="2">
+               <children>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="6" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b6" style="-fx-background-color: #769656;" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+            <StackPane fx:id="c6" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="2" GridPane.rowIndex="2" />
+            <StackPane fx:id="d6" style="-fx-background-color: #769656;" GridPane.columnIndex="3" GridPane.rowIndex="2" />
+            <StackPane fx:id="e6" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="4" GridPane.rowIndex="2" />
+            <StackPane fx:id="f6" style="-fx-background-color: #769656;" GridPane.columnIndex="5" GridPane.rowIndex="2" />
+            <StackPane fx:id="g6" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="6" GridPane.rowIndex="2" />
+            <StackPane fx:id="h6" style="-fx-background-color: #769656;" GridPane.columnIndex="7" GridPane.rowIndex="2" />
+            <!-- Linha 5 -->
+            <StackPane fx:id="a5" style="-fx-background-color: #769656;" GridPane.rowIndex="3">
+               <children>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="5" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b5" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+            <StackPane fx:id="c5" style="-fx-background-color: #769656;" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+            <StackPane fx:id="d5" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="3" GridPane.rowIndex="3" />
+            <StackPane fx:id="e5" style="-fx-background-color: #769656;" GridPane.columnIndex="4" GridPane.rowIndex="3" />
+            <StackPane fx:id="f5" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="5" GridPane.rowIndex="3" />
+            <StackPane fx:id="g5" style="-fx-background-color: #769656;" GridPane.columnIndex="6" GridPane.rowIndex="3" />
+            <StackPane fx:id="h5" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="7" GridPane.rowIndex="3" />
+            <!-- Linha 4 -->
+            <StackPane fx:id="a4" style="-fx-background-color: #eeeed2;" GridPane.rowIndex="4">
+               <children>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="4" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b4" style="-fx-background-color: #769656;" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+            <StackPane fx:id="c4" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+            <StackPane fx:id="d4" style="-fx-background-color: #769656;" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+            <StackPane fx:id="e4" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="4" GridPane.rowIndex="4" />
+            <StackPane fx:id="f4" style="-fx-background-color: #769656;" GridPane.columnIndex="5" GridPane.rowIndex="4" />
+            <StackPane fx:id="g4" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="6" GridPane.rowIndex="4" />
+            <StackPane fx:id="h4" style="-fx-background-color: #769656;" GridPane.columnIndex="7" GridPane.rowIndex="4" />
+            <!-- Linha 3 -->
+            <StackPane fx:id="a3" style="-fx-background-color: #769656;" GridPane.rowIndex="5">
+               <children>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="3" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b3" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+            <StackPane fx:id="c3" style="-fx-background-color: #769656;" GridPane.columnIndex="2" GridPane.rowIndex="5" />
+            <StackPane fx:id="d3" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="3" GridPane.rowIndex="5" />
+            <StackPane fx:id="e3" style="-fx-background-color: #769656;" GridPane.columnIndex="4" GridPane.rowIndex="5" />
+            <StackPane fx:id="f3" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="5" GridPane.rowIndex="5" />
+            <StackPane fx:id="g3" style="-fx-background-color: #769656;" GridPane.columnIndex="6" GridPane.rowIndex="5" />
+            <StackPane fx:id="h3" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="7" GridPane.rowIndex="5" />
+            <!-- Linha 2 (Peões Brancos) -->
+            <StackPane fx:id="a2" style="-fx-background-color: #eeeed2;" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="2" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b2" style="-fx-background-color: #769656;" GridPane.columnIndex="1" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="c2" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="2" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="d2" style="-fx-background-color: #769656;" GridPane.columnIndex="3" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="e2" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="4" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="f2" style="-fx-background-color: #769656;" GridPane.columnIndex="5" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="g2" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="6" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <StackPane fx:id="h2" style="-fx-background-color: #769656;" GridPane.columnIndex="7" GridPane.rowIndex="6">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaPeaoBranco.png" />
+                     </image>
+                  </ImageView>
+               </children>
+            </StackPane>
+            <!-- Linha 1 (Peças Brancas) -->
+            <StackPane fx:id="a1" style="-fx-background-color: #769656;" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaTorreBranca.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="1" StackPane.alignment="TOP_LEFT">
+                     <padding>
+                        <Insets left="5.0" top="2.0" />
+                     </padding>
+                  </Label>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="a" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="b1" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="1" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaCavaloBranco.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="b" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="c1" style="-fx-background-color: #769656;" GridPane.columnIndex="2" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaBispoBranco.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="c" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="d1" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="3" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaRainhaBranca.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="d" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="e1" style="-fx-background-color: #769656;" GridPane.columnIndex="4" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaReiBranco.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="e" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="f1" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="5" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaBispoBranco.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="f" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="g1" style="-fx-background-color: #769656;" GridPane.columnIndex="6" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaCavaloBranco.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #eeeed2;" text="g" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+            <StackPane fx:id="h1" style="-fx-background-color: #eeeed2;" GridPane.columnIndex="7" GridPane.rowIndex="7">
+               <children>
+                  <ImageView fitHeight="70.0" fitWidth="70.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@imagens/PecaTorreBranca.png" />
+                     </image>
+                  </ImageView>
+                  <Label style="-fx-font-weight: bold; -fx-text-fill: #769656;" text="h" StackPane.alignment="BOTTOM_RIGHT">
+                     <padding>
+                        <Insets bottom="2.0" right="5.0" />
+                     </padding>
+                  </Label>
+               </children>
+            </StackPane>
+         </children>
+      </GridPane>
+      <Pane fx:id="uiPane" pickOnBounds="false" prefHeight="373.0" prefWidth="559.0">
+         <children>
+            <Pane fx:id="btnVoltar" layoutX="90.0" layoutY="33.0" onMouseClicked="#voltarParaHome" prefHeight="99.0" prefWidth="279.0" style="-fx-background-color: #786666; -fx-background-radius: 50;">
+               <children>
+                  <Text fill="WHITE" layoutX="70.0" layoutY="69.0" strokeType="OUTSIDE" strokeWidth="0.0" style="-fx-font-weight: bold;" text="Voltar" textAlignment="CENTER">
+                     <font>
+                        <Font size="48.0" />
+                     </font>
+                  </Text>
+               </children>
+            </Pane>
+         </children>
+      </Pane>
+   </children>
+</StackPane>
